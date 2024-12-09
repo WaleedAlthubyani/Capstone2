@@ -84,6 +84,9 @@ public class UserService {
 
     public void shareMyWorkoutPlan(Integer userId,Integer workoutPlanId){
         getUserById(userId);
+        if (userWorkoutPlanRepository.findUserWorkoutPlanByUserId(userId)==null)
+            throw new ApiException("User doesn't have a workout plan");
+
         if (!userWorkoutPlanRepository.findUserWorkoutPlanByUserId(userId).getWorkoutPlanId().equals(workoutPlanId))
             throw new ApiException("workout plan not found");
 
@@ -197,5 +200,9 @@ public class UserService {
             return "Need to complete "+(5-goalService.getGoalsByUserIdAndCompleted(userId).size())+" goals to get next achievement";
         else
             return "Need to complete 1 goal to get achievement";
+    }
+
+    public List<SuggestedPlan> getSuggestedPlanForUser(Integer userId){
+        return suggestedPlanService.getSuggestedPlanByUserId(userId);
     }
 }

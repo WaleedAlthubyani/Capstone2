@@ -70,4 +70,8 @@ public class SuggestedPlanService {
     public List<SuggestedPlan> getSuggestedPlanByInstructorId(Integer instructorId){
         return suggestedPlanRepository.findSuggestedPlansByInstructorIdAndStatus(instructorId,"accepted");
     }
+
+    public List<SuggestedPlan> getSuggestedPlanByUserId(Integer userId){
+        return suggestedPlanRepository.findSuggestedPlansByUserId(userId);
+    }
 }

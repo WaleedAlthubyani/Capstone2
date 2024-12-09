@@ -60,13 +60,13 @@ public class GoalController {
         return ResponseEntity.status(200).body(new ApiResponse<>(goalService.getGoalsByUserId(id)));
     }
 
-    //1
+
     @GetMapping("/get-user-goals-by-progress/{id}/{progress}")
     public ResponseEntity<ApiResponse<List<Goal>>> getUserGoalsByProgress(@PathVariable Integer id,@PathVariable Integer progress){
         return ResponseEntity.status(200).body(new ApiResponse<>(goalService.getUserGoalsByProgress(id,progress)));
     }
 
-    //2
+
     @GetMapping("/get-user-goals-by-progress-range/{id}/{min-progress}/{max-progress}")
     public ResponseEntity<ApiResponse<List<Goal>>> getUserGoalsByProgressRange(@PathVariable Integer id,@PathVariable(name = "min-progress") Integer minProgress,@PathVariable(name = "max-progress") Integer maxProgress){
         return ResponseEntity.status(200).body(new ApiResponse<>(goalService.getUserGoalsByProgressRange(id,minProgress,maxProgress)));

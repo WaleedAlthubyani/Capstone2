@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Check;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.URL;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDateTime;
 

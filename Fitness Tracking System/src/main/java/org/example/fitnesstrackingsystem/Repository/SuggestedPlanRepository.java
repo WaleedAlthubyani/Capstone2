@@ -12,4 +12,6 @@ public interface SuggestedPlanRepository extends JpaRepository<SuggestedPlan,Int
     SuggestedPlan findSuggestedPlanById(Integer id);
 
     List<SuggestedPlan> findSuggestedPlansByInstructorIdAndStatus(Integer instructorId, String status);
+
+    List<SuggestedPlan> findSuggestedPlansByUserId(Integer id);
 }

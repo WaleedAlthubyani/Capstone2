@@ -58,20 +58,20 @@ public class InstructorController {
         return ResponseEntity.status(200).body(new ApiResponse<>("Workout plan suggested successfully"));
     }
 
-    //3
+
     @GetMapping("/get-instructor-students/{id}")
     public ResponseEntity<ApiResponse<List<InstructorStudent>>> getMyStudents(@PathVariable Integer id){
         return ResponseEntity.status(200).body(new ApiResponse<>(instructorService.getMyStudents(id)));
     }
 
-    //4
+
     @DeleteMapping("/expel-a-student/{instructor-id}/{user-id}")
     public ResponseEntity<ApiResponse<String>> expelAStudent(@PathVariable(name = "instructor-id") Integer instructorId,@PathVariable(name = "user-id") Integer userId){
         instructorService.deleteAStudent(instructorId,userId);
         return ResponseEntity.status(200).body(new ApiResponse<>("Student expelled successfully"));
     }
 
-    //15
+
     @GetMapping("/get-students-completed-plan/{instructor-id}")
     public ResponseEntity<ApiResponse<List<User>>> getStudentsCompletedWorkoutPlan(@PathVariable(name = "instructor-id") Integer instructorId){
         return ResponseEntity.status(200).body(new ApiResponse<>(instructorService.getStudentsCompletedWorkoutPlan(instructorId)));
