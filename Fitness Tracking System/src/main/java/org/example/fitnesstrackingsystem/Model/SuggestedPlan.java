@@ -1,5 +1,6 @@
 package org.example.fitnesstrackingsystem.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
@@ -43,7 +44,7 @@ public class SuggestedPlan {
     @Column(columnDefinition = "varchar(8) not null")
     private String status="Pending";
 
-    @Null(message = "Decision date must be empty for now")
+
     @Column(columnDefinition = "timestamp null")
-    private LocalDateTime decidedOn;
+    private LocalDateTime decidedOn=null;
 }
