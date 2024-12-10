@@ -3,10 +3,12 @@ package org.example.fitnesstrackingsystem.Service;
 import lombok.RequiredArgsConstructor;
 import org.example.fitnesstrackingsystem.ApiResponse.ApiException;
 import org.example.fitnesstrackingsystem.Model.Exercise;
+import org.example.fitnesstrackingsystem.Model.WorkoutPlan;
 import org.example.fitnesstrackingsystem.Repository.ExerciseRepository;
 import org.example.fitnesstrackingsystem.Repository.WorkoutPlanRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -21,10 +23,13 @@ public class ExerciseService {
     }
 
     public void addExercise(Exercise exercise){
-        if (workoutPlanRepository.findWorkoutPlanById(exercise.getWorkoutPlanId())==null)
+        WorkoutPlan workoutPlan = workoutPlanRepository.findWorkoutPlanById(exercise.getWorkoutPlanId());
+        if (workoutPlan == null)
             throw new ApiException("Workout plan not found");
 
         exerciseRepository.save(exercise);
+        workoutPlan.setUpdatedAt(LocalDateTime.now());
+        workoutPlanRepository.save(workoutPlan);
     }
 
     public void updateExercise(Integer id,Exercise exercise){

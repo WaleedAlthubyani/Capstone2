@@ -2,14 +2,8 @@ package org.example.fitnesstrackingsystem.Service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.fitnesstrackingsystem.ApiResponse.ApiException;
-import org.example.fitnesstrackingsystem.Model.Instructor;
-import org.example.fitnesstrackingsystem.Model.InstructorStudent;
-import org.example.fitnesstrackingsystem.Model.SuggestedPlan;
-import org.example.fitnesstrackingsystem.Model.User;
-import org.example.fitnesstrackingsystem.Repository.InstructorRepository;
-import org.example.fitnesstrackingsystem.Repository.InstructorStudentRepository;
-import org.example.fitnesstrackingsystem.Repository.UserRepository;
-import org.example.fitnesstrackingsystem.Repository.UserWorkoutPlanRepository;
+import org.example.fitnesstrackingsystem.Model.*;
+import org.example.fitnesstrackingsystem.Repository.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,9 +19,16 @@ public class InstructorService {
     private final WorkoutPlanService workoutPlanService;
     private final UserRepository userRepository;
     private final UserWorkoutPlanRepository userWorkoutPlanRepository;
+    private final WorkoutPlanRepository workoutPlanRepository;
+    private final ExerciseService exerciseService;
 
-    public List<Instructor> getAllInstructors(){
-        return instructorRepository.findAll();
+    public List<Instructor> getAllActiveInstructors() {
+
+        return instructorRepository.findAllByStatus("active");
+    }
+
+    public List<Instructor> getAllInActiveInstructor() {
+        return instructorRepository.findAllByStatus("inactive");
     }
 
     public void addInstructor(Instructor instructor){
@@ -68,8 +69,84 @@ public class InstructorService {
         return instructor;
     }
 
+    public void createWorkoutPlan(Integer id, WorkoutPlan workoutPlan) {
+        Instructor instructor = getInstructorById(id);
+        if (instructor.getStatus().equalsIgnoreCase("inactive"))
+            throw new ApiException("Wait for an admin to activate your account");
+
+        workoutPlan.setCreatedBy("Instructor: " + getInstructorById(id).getName());
+        workoutPlan.setPlanType("Certified plan");
+
+        workoutPlanService.addWorkoutPlan(workoutPlan);
+    }
+
+    public List<WorkoutPlan> getMyCreatedWorkoutPlans(Integer id) {
+        Instructor instructor = getInstructorById(id);
+
+        List<WorkoutPlan> workoutPlans = workoutPlanRepository.findWorkoutPlansByCreatedBy(instructor.getName());
+
+        if (workoutPlans.isEmpty())
+            throw new ApiException("Workout plans not found");
+
+        return workoutPlans;
+    }
+
+    public void updateMyWorkoutPlan(Integer id, WorkoutPlan workoutPlan) {
+        Instructor instructor = getInstructorById(id);
+
+        if (!workoutPlan.getCreatedBy().equalsIgnoreCase(instructor.getName()))
+            throw new ApiException("Workout plan wasn't created by you");
+
+        workoutPlanService.updateWorkoutPlan(workoutPlan.getId(), workoutPlan);
+    }
+
+    public void deleteMyCreatedWorkoutPlan(Integer instructorId, Integer workoutPlanId) {
+        Instructor instructor = getInstructorById(instructorId);
+
+        if (!workoutPlanRepository.findWorkoutPlanById(workoutPlanId).getCreatedBy().equalsIgnoreCase(instructor.getName()))
+            throw new ApiException("Workout plan wasn't created by you");
+
+        workoutPlanService.deleteWorkoutPlan(workoutPlanId);
+    }
+
+    public void addExercise(Integer id, Exercise exercise) {
+        Instructor instructor = getInstructorById(id);
+
+        WorkoutPlan workoutPlan = workoutPlanRepository.findWorkoutPlanByIdAndCreatedBy(exercise.getWorkoutPlanId(), instructor.getName());
+
+        if (workoutPlan == null)
+            throw new ApiException("Workout plan wasn't created by you");
+
+        exerciseService.addExercise(exercise);
+    }
+
+    public void updateMyExercise(Integer id, Exercise exercise) {
+        Instructor instructor = getInstructorById(id);
+
+        WorkoutPlan workoutPlan = workoutPlanRepository.findWorkoutPlanByIdAndCreatedBy(exercise.getWorkoutPlanId(), instructor.getName());
+
+        if (workoutPlan == null)
+            throw new ApiException("Exercise wasn't created by you");
+
+        exerciseService.updateExercise(exercise.getId(), exercise);
+    }
+
+    public void deleteMyExercise(Integer userId, Integer exerciseId) {
+        Instructor instructor = getInstructorById(userId);
+
+        WorkoutPlan w = workoutPlanRepository.findWorkoutPlanByIdAndCreatedBy(exerciseService.getExerciseById(exerciseId).getWorkoutPlanId(), instructor.getName());
+
+        if (w == null)
+            throw new ApiException("exercise wasn't created by you");
+
+        exerciseService.deleteExercise(exerciseId);
+    }
+
     public void suggestWorkoutPlan(Integer instructorId, Integer workoutPlanId, Integer userId){
-        getInstructorById(instructorId);
+        Instructor instructor = getInstructorById(instructorId);
+        if (instructor.getStatus().equalsIgnoreCase("inactive"))
+            throw new ApiException("Please wait for an admin to approve your account");
+
         workoutPlanService.getWorkoutPlanById(workoutPlanId);
         User user=userRepository.findUserById(userId);
 

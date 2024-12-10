@@ -1,6 +1,6 @@
 package org.example.fitnesstrackingsystem.Model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -29,11 +29,11 @@ public class UserWorkoutPlan {
     @Column(columnDefinition = "varchar(11) not null")
     private String status="not started";
 
-    @JsonIgnore
+
     @Column(columnDefinition = "int not null")
     private Integer exercises;
 
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Column(columnDefinition = "int not null")
     private Integer completed=0;
 }

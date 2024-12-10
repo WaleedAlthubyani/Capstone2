@@ -77,9 +77,7 @@ public class GoalService {
         if (userRepository.findUserById(id)==null)
             throw new ApiException("User not found");
 
-        List<Goal> goals=goalRepository.findGoalsByUserIdAndProgress(id,100);
-
-        return goals;
+        return goalRepository.findGoalsByUserIdAndProgress(id,100);
     }
 
     public List<Goal> getUserGoalsByProgress(Integer id, Integer progress){

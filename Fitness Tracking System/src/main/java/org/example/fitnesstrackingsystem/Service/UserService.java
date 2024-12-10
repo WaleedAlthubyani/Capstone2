@@ -6,7 +6,6 @@ import org.example.fitnesstrackingsystem.Model.*;
 import org.example.fitnesstrackingsystem.Repository.*;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -16,16 +15,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final InstructorService instructorService;
     private final InstructorRepository instructorRepository;
-    private final AchievementRepository achievementRepository;
     private final UserAchievementRepository userAchievementRepository;
     private final PostService postService;
     private final SuggestedPlanService suggestedPlanService;
     private final GoalService goalService;
-    private final AchievementService achievementService;
     private final WorkoutPlanRepository workoutPlanRepository;
     private final UserWorkoutPlanRepository userWorkoutPlanRepository;
     private final ExerciseRepository exerciseRepository;
     private final UserWorkoutPlanService userWorkoutPlanService;
+    private final WorkoutPlanService workoutPlanService;
+    private final ExerciseService exerciseService;
 
     public List<User> getAllUsers(){
         return userRepository.findAll();
@@ -63,6 +62,76 @@ public class UserService {
         return user;
     }
 
+    public void createAWorkoutPlan(Integer id, WorkoutPlan workoutPlan) {
+        User user = getUserById(id);
+
+        workoutPlan.setCreatedBy(user.getName());
+        workoutPlan.setPlanType("User plan");
+
+        workoutPlanService.addWorkoutPlan(workoutPlan);
+    }
+
+    public void updateMyWorkoutPlan(Integer id, WorkoutPlan workoutPlan){
+        User user=getUserById(id);
+
+        if (!workoutPlan.getCreatedBy().equalsIgnoreCase(user.getName()))
+            throw new ApiException("Workout plan wasn't created by you");
+
+        workoutPlanService.updateWorkoutPlan(workoutPlan.getId(), workoutPlan);
+    }
+
+    public void deleteMyCreatedWorkoutPlan(Integer userId,Integer workoutPlanId){
+        User user=getUserById(userId);
+
+        if (!workoutPlanRepository.findWorkoutPlanById(workoutPlanId).getCreatedBy().equalsIgnoreCase(user.getName()))
+            throw new ApiException("Workout plan wasn't created by you");
+
+        workoutPlanService.deleteWorkoutPlan(workoutPlanId);
+    }
+
+    public void addExercise(Integer id, Exercise exercise) {
+        User user = getUserById(id);
+
+        WorkoutPlan workoutPlan = workoutPlanRepository.findWorkoutPlanByIdAndCreatedBy(exercise.getWorkoutPlanId(), user.getName());
+
+        if (workoutPlan == null)
+            throw new ApiException("Workout plan wasn't created by you");
+
+        exerciseService.addExercise(exercise);
+    }
+
+    public void updateMyExercise(Integer id, Exercise exercise) {
+        User user = getUserById(id);
+
+        WorkoutPlan workoutPlan = workoutPlanRepository.findWorkoutPlanByIdAndCreatedBy(exercise.getWorkoutPlanId(), user.getName());
+
+        if (workoutPlan == null)
+            throw new ApiException("Exercise wasn't created by you");
+
+        exerciseService.updateExercise(exercise.getId(), exercise);
+    }
+
+    public void deleteMyExercise(Integer userId, Integer exerciseId) {
+        User user = getUserById(userId);
+
+        WorkoutPlan w = workoutPlanRepository.findWorkoutPlanByIdAndCreatedBy(exerciseService.getExerciseById(exerciseId).getWorkoutPlanId(), user.getName());
+
+        if (w == null)
+            throw new ApiException("exercise wasn't created by you");
+
+        exerciseService.deleteExercise(exerciseId);
+    }
+
+    public List<WorkoutPlan> getMyCreatedPlans(Integer id) {
+        User user = getUserById(id);
+
+        List<WorkoutPlan> workoutPlans = workoutPlanRepository.findWorkoutPlansByCreatedBy(user.getName());
+        if (workoutPlans.isEmpty())
+            throw new ApiException("Workout plans not found");
+
+        return workoutPlans;
+    }
+
     public void addUserWorkoutPlan(Integer userId,Integer workoutPlanId){
         getUserById(userId);
         WorkoutPlan workoutPlan=workoutPlanRepository.findWorkoutPlanById(workoutPlanId);
@@ -79,7 +148,6 @@ public class UserService {
         userWorkoutPlan.setCompleted(0);
 
         userWorkoutPlanService.addWorkoutPlan(userWorkoutPlan);
-
     }
 
     public void shareMyWorkoutPlan(Integer userId,Integer workoutPlanId){
@@ -115,37 +183,6 @@ public class UserService {
     public void updateMyGoalProgress(Integer userId,Integer goalId,Integer progress){
         getUserById(userId);
         goalService.updateProgress(userId,goalId,progress);
-    }
-
-    public void createAchievement(Integer adminId,String name,String description){
-
-        User admin=getUserById(adminId);
-
-        if (admin.getRole().equalsIgnoreCase("trainee"))
-            throw new ApiException("Not authorized to do this action");
-
-        Achievement achievement = new Achievement();
-
-        achievement.setName(name);
-        achievement.setDescription(description);
-        achievementService.addAchievement(achievement);
-    }
-
-    public void receiveAchievement(Integer userId,String achievementName){
-        getUserById(userId);
-
-        Achievement achievement=achievementRepository.findAchievementsByName(achievementName);
-
-        if (achievement==null)
-            throw new ApiException("achievement not found");
-
-        UserAchievement userAchievement=new UserAchievement();
-
-        userAchievement.setAchievementId(achievement.getId());
-        userAchievement.setUserId(userId);
-        userAchievement.setReceivedAt(LocalDate.now());
-
-        userAchievementRepository.save(userAchievement);
     }
 
     public void advanceExerciseStatus(Integer userId,Integer workoutPlanId, Integer exerciseId){
@@ -191,7 +228,7 @@ public class UserService {
         return achievements;
     }
 
-    public String nextAchievement(Integer userId){
+    public String nextGoalAchievement(Integer userId) {
         if (goalService.getGoalsByUserIdAndCompleted(userId).size()>=10)
             return "You completed all goal achievements";
         else if (goalService.getGoalsByUserIdAndCompleted(userId).size()>=5)
@@ -204,5 +241,12 @@ public class UserService {
 
     public List<SuggestedPlan> getSuggestedPlanForUser(Integer userId){
         return suggestedPlanService.getSuggestedPlanByUserId(userId);
+    }
+
+    public List<Instructor> getAllInactiveInstructors(Integer id) {
+        if (getUserById(id).getRole().equalsIgnoreCase("trainee"))
+            throw new ApiException("You are not authorized to do this action");
+
+        return instructorService.getAllInActiveInstructor();
     }
 }

@@ -6,12 +6,10 @@ import org.example.fitnesstrackingsystem.ApiResponse.ApiResponse;
 import org.example.fitnesstrackingsystem.Model.Post;
 import org.example.fitnesstrackingsystem.Service.PostService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/fitness-tracking-system/post")
@@ -26,20 +24,13 @@ public class PostController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse<String>> addPost(@RequestBody @Valid Post post, Errors errors) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.status(400).body(new ApiResponse<>(Objects.requireNonNull(errors.getFieldError()).getDefaultMessage()));
-        }
-
+    public ResponseEntity<ApiResponse<String>> addPost(@RequestBody @Valid Post post) {
         postService.addPost(post);
         return ResponseEntity.status(201).body(new ApiResponse<>("Post created successfully"));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<ApiResponse<String>> updatePost(@PathVariable Integer id, @RequestBody @Valid Post post, Errors errors) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.status(400).body(new ApiResponse<>(Objects.requireNonNull(errors.getFieldError()).getDefaultMessage()));
-        }
+    public ResponseEntity<ApiResponse<String>> updatePost(@PathVariable Integer id, @RequestBody @Valid Post post) {
 
         postService.updatePost(id, post);
         return ResponseEntity.status(200).body(new ApiResponse<>("Post updated successfully"));

@@ -1,7 +1,10 @@
 package org.example.fitnesstrackingsystem.Model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,6 +31,14 @@ public class WorkoutPlan {
     @Column(columnDefinition = "varchar(255) not null")
     private String description;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Column(columnDefinition = "varchar(100) not null")
+    private String createdBy;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Column(columnDefinition = "varchar(14) not null")
+    private String planType;
+
     @NotNull(message = "Please enter the expected start date")
     @FutureOrPresent(message = "start date can only be today or in the future")
     @Column
@@ -42,8 +53,11 @@ public class WorkoutPlan {
     @Column(columnDefinition = "timestamp")
     private LocalDateTime createdAt;
 
-    @Null(message = "You can't have an updated Date yet")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Column(columnDefinition = "timestamp null")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt = null;
 
+    @NotNull(message = "Please enter true or false for isPublic")
+    @Column(columnDefinition = "boolean not null")
+    private Boolean isPublic;
 }

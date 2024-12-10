@@ -1,5 +1,6 @@
 package org.example.fitnesstrackingsystem.Model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -40,7 +41,7 @@ public class Goal {
     @Column(columnDefinition = "timestamp")
     private LocalDateTime createdAt;
 
-    @Null(message = "you can't have an update date yet")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Column(columnDefinition = "timestamp null")
     private LocalDateTime updatedAt;
 

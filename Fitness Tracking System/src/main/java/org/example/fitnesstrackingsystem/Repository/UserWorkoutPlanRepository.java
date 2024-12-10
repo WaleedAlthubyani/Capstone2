@@ -7,8 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserWorkoutPlanRepository extends JpaRepository<UserWorkoutPlan,Integer> {
 
-    UserWorkoutPlan findUserWorkoutPlanById(Integer id);
-
     UserWorkoutPlan findUserWorkoutPlanByUserId(Integer id);
 
     UserWorkoutPlan findUserWorkoutPlanByUserIdAndWorkoutPlanId(Integer user,Integer plan);

@@ -6,11 +6,9 @@ import org.example.fitnesstrackingsystem.ApiResponse.ApiResponse;
 import org.example.fitnesstrackingsystem.Model.Goal;
 import org.example.fitnesstrackingsystem.Service.GoalService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/fitness-tracking-system/goal")
@@ -25,20 +23,13 @@ public class GoalController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse<String>> addGoal(@RequestBody @Valid Goal goal, Errors errors) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.status(400).body(new ApiResponse<>(Objects.requireNonNull(errors.getFieldError()).getDefaultMessage()));
-        }
-
+    public ResponseEntity<ApiResponse<String>> addGoal(@RequestBody @Valid Goal goal) {
         goalService.addGoal(goal);
         return ResponseEntity.status(201).body(new ApiResponse<>("Goal created successfully"));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<ApiResponse<String>> updateGoal(@PathVariable Integer id, @RequestBody @Valid Goal goal, Errors errors) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.status(400).body(new ApiResponse<>(Objects.requireNonNull(errors.getFieldError()).getDefaultMessage()));
-        }
+    public ResponseEntity<ApiResponse<String>> updateGoal(@PathVariable Integer id, @RequestBody @Valid Goal goal) {
 
         goalService.updateGoal(id, goal);
         return ResponseEntity.status(200).body(new ApiResponse<>("Goal updated successfully"));

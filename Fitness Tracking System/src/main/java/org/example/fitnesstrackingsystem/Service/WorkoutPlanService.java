@@ -15,8 +15,9 @@ public class WorkoutPlanService {
 
     private final WorkoutPlanRepository workoutPlanRepository;
 
-    public List<WorkoutPlan> getAllWorkoutPlans(){
-        return workoutPlanRepository.findAll();
+    public List<WorkoutPlan> getAllPublicWorkoutPlans() {
+
+        return workoutPlanRepository.findAllByIsPublic(true);
     }
 
     public void addWorkoutPlan(WorkoutPlan workoutPlan){

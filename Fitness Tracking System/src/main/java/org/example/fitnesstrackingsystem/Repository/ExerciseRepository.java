@@ -12,6 +12,4 @@ public interface ExerciseRepository extends JpaRepository<Exercise,Integer> {
     Exercise findExerciseById(Integer id);
 
     List<Exercise> findExercisesByWorkoutPlanId(Integer id);
-
-    List<Exercise> findExercisesByWorkoutPlanIdAndStatus(Integer id,String status);
 }

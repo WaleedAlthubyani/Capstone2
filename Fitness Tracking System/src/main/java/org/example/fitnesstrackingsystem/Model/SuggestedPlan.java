@@ -1,9 +1,8 @@
 package org.example.fitnesstrackingsystem.Model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -44,7 +43,7 @@ public class SuggestedPlan {
     @Column(columnDefinition = "varchar(8) not null")
     private String status="Pending";
 
-
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Column(columnDefinition = "timestamp null")
     private LocalDateTime decidedOn=null;
 }

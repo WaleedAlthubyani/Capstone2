@@ -1,10 +1,10 @@
 package org.example.fitnesstrackingsystem.Model;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,9 +30,9 @@ public class Comment {
     @Column(columnDefinition = "timestamp")
     private LocalDateTime createdAt;
 
-    @Null(message = "You can't enter an updated date")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Column(columnDefinition = "timestamp null")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt = null;
 
     @NotNull(message = "Please enter a user ID")
     @Column(columnDefinition = "int not null")

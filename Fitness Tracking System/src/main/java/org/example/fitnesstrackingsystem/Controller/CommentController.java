@@ -6,12 +6,10 @@ import org.example.fitnesstrackingsystem.ApiResponse.ApiResponse;
 import org.example.fitnesstrackingsystem.Model.Comment;
 import org.example.fitnesstrackingsystem.Service.CommentService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/fitness-tracking-system/comment")
@@ -26,20 +24,13 @@ public class CommentController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse<String>> addComment(@RequestBody @Valid Comment comment, Errors errors) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.status(400).body(new ApiResponse<>(Objects.requireNonNull(errors.getFieldError()).getDefaultMessage()));
-        }
-
+    public ResponseEntity<ApiResponse<String>> addComment(@RequestBody @Valid Comment comment) {
         commentService.addComment(comment);
         return ResponseEntity.status(201).body(new ApiResponse<>("Comment created successfully"));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<ApiResponse<String>> updateComment(@PathVariable Integer id, @RequestBody @Valid Comment comment, Errors errors) {
-        if (errors.hasErrors()) {
-            return ResponseEntity.status(400).body(new ApiResponse<>(Objects.requireNonNull(errors.getFieldError()).getDefaultMessage()));
-        }
+    public ResponseEntity<ApiResponse<String>> updateComment(@PathVariable Integer id, @RequestBody @Valid Comment comment) {
 
         commentService.updateComment(id, comment);
         return ResponseEntity.status(200).body(new ApiResponse<>("Comment updated successfully"));
